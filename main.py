@@ -10,10 +10,12 @@ async def read_root():
 
 @app.get("/news")
 async def get_news_list():
-    news = get_news()  # هذه دالة لجلب الأخبار
-    return news
+    # جلب الأخبار من خدمة الأخبار
+    news_data = get_news()
+    return news_data
 
 @app.get("/narrative/{news_id}")
 async def get_narrative(news_id: int):
-    narrative = generate_narrative(news_id)  # دالة لتحليل الأخبار
+    # تحليل الخبر باستخدام الذكاء الاصطناعي
+    narrative = generate_narrative(news_id)
     return narrative
