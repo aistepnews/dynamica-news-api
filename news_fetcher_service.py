@@ -16,7 +16,7 @@ logger = logging.getLogger("news_fetcher_service")
 
 # تصحيح الاستيرادات
 from news_fetcher import NewsAutoFetcher
-from narrative_generator import NarrativeGenerator
+from narrative_generator import generate_narrative
 
 class NewsService:
     def __init__(self, fetch_interval=1800):
