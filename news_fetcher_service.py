@@ -22,7 +22,7 @@ class NewsService:
     def __init__(self, fetch_interval=1800):
         self.fetch_interval = fetch_interval
         self.news_fetcher = NewsAutoFetcher()
-        self.narrative_generator = NarrativeGenerator()
+        self.narrative_generator = generate_narrative()
         self.running = False
         self.thread = None
         logger.info("تم تهيئة خدمة جلب الأخبار")
