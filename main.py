@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from news_fetcher_service import get_news  # تأكد من أن هذه الدالة موجودة
-from narrative_generator import generate_narrative  # تأكد من أن هذه الدالة موجودة
+from news_fetcher_service import get_news  # تأكد من أن هذه الدالة موجودة في news_fetcher_service
+from narrative_generator import generate_narrative  # تأكد من أن هذه الدالة موجودة في narrative_generator
 
 app = FastAPI()
 
@@ -12,7 +12,7 @@ async def read_root():
 async def get_news_list():
     try:
         # جلب الأخبار من خدمة الأخبار
-        news_data = get_news()
+        news_data = get_news()  # سيتم استيراد الدالة من ملف news_fetcher_service
         if not news_data:
             raise HTTPException(status_code=404, detail="No news found.")
         return news_data
@@ -23,7 +23,7 @@ async def get_news_list():
 async def get_narrative(news_id: int):
     try:
         # تحليل الخبر باستخدام الذكاء الاصطناعي
-        narrative = generate_narrative(news_id)
+        narrative = generate_narrative(news_id)  # سيتم استيراد الدالة من ملف narrative_generator
         if not narrative:
             raise HTTPException(status_code=404, detail="Narrative not found for the given news_id.")
         return narrative
