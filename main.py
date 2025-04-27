@@ -20,9 +20,7 @@ app.add_middleware(
 
 # روابط RSS Feeds للمصادر الثلاثة
 RSS_FEEDS = [
-    "https://stepagency-sy.net/feed/",
-    "https://www.aljazeera.net/aljazeerarss",
-    "https://www.syria.tv/rss.xml"
+    "https://stepagency-sy.net/feed/"
 ]
 
 def fetch_all_news():
