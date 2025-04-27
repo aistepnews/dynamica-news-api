@@ -17,7 +17,7 @@ logging.basicConfig(
 logger = logging.getLogger("news_fetcher_service")
 
 # إضافة المسار إلى الخدمات
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.join(os.path.dirname(__file__), "path_to_modules"))
 
 try:
     from app.services.news_fetcher import NewsAutoFetcher
