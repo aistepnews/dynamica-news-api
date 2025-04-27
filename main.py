@@ -1,49 +1,19 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-import feedparser
-from datetime import datetime
+from news_fetcher_service import get_news
+from narrative_generator import generate_narrative
 
 app = FastAPI()
 
-# إعدادات CORS
-origins = [
-    "https://aistepnews.github.io",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# روابط RSS Feeds للمصادر الثلاثة
-RSS_FEEDS = [
-    "https://stepagency-sy.net/feed/"
-]
-
-def fetch_all_news():
-    news_items = []
-    for feed_url in RSS_FEEDS:
-        feed = feedparser.parse(feed_url)
-        for entry in feed.entries:
-            news_items.append({
-                "title": entry.title,
-                "link": entry.link,
-                "published": entry.published if "published" in entry else datetime.now().isoformat(),
-                "summary": entry.summary if "summary" in entry else "",
-                "source": feed.feed.title if "title" in feed.feed else "Unknown",
-            })
-    # ترتيب الأخبار من الأحدث إلى الأقدم (اختياري)
-    news_items.sort(key=lambda x: x['published'], reverse=True)
-    return news_items
-
 @app.get("/")
-def read_root():
-    return {"message": "أهلاً بكم في وكالة دايناميكا الإخبارية!"}
+async def read_root():
+    return {"message": "Welcome to Dynamica News API!"}
 
 @app.get("/news")
-def get_news():
-    news = fetch_all_news()
+async def get_news_list():
+    news = get_news()  # هذه دالة لجلب الأخبار
     return news
+
+@app.get("/narrative/{news_id}")
+async def get_narrative(news_id: int):
+    narrative = generate_narrative(news_id)  # دالة لتحليل الأخبار
+    return narrative
