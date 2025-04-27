@@ -14,7 +14,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("news_fetcher_service")
 
-# تصحيح الاستيرادات
 from news_fetcher import NewsAutoFetcher
 from narrative_generator import generate_narrative
 
@@ -22,7 +21,6 @@ class NewsService:
     def __init__(self, fetch_interval=1800):
         self.fetch_interval = fetch_interval
         self.news_fetcher = NewsAutoFetcher()
-        self.narrative_generator = generate_narrative()
         self.running = False
         self.thread = None
         logger.info("تم تهيئة خدمة جلب الأخبار")
@@ -31,8 +29,7 @@ class NewsService:
         if self.running:
             return False
         self.running = True
-        self.thread = threading.Thread(target=self._run_service)
-        self.thread.daemon = True
+        self.thread = threading.Thread(target=self._run_service, daemon=True)
         self.thread.start()
         logger.info("تم بدء خدمة جلب الأخبار")
         return True
@@ -49,18 +46,37 @@ class NewsService:
     def _run_service(self):
         while self.running:
             try:
-                result = self.news_fetcher.fetch_news()
-                unprocessed_news = self.news_fetcher.get_news(limit=10, processed=False)
-                for news in unprocessed_news:
+                # 1) جلب الأخبار الجديدة
+                self.news_fetcher.fetch_news()
+
+                # 2) استرجاع أحدث 10 أخبار غير معالجة
+                unprocessed = self.news_fetcher.get_news(limit=10, processed=False)
+                for item in unprocessed:
+                    news_id   = item['id']
+                    title     = item.get('title', '')
+                    content   = item.get('content', '')
+
+                    # 3) توليد أنواع مختلفة من السرد
                     for narrative_type in ["summary", "official", "critical", "analysis", "human"]:
-                        self.narrative_generator.generate_narrative(
-                            news['id'], news['title'], news['content'], narrative_type
+                        narrative_text = generate_narrative(
+                            news_id,
+                            title,
+                            content,
+                            narrative_type
                         )
-                    self.news_fetcher.mark_as_processed(news['id'])
+                        # هنا يمكنك حفظ السرد في قاعدة بياناتك أو معالجته كما تشاء
+                        logger.info(f"Generated {narrative_type} for news {news_id}")
+
+                    # 4) تعليم الخبر بأنه تمّت معالجته
+                    self.news_fetcher.mark_as_processed(news_id)
+
+                # 5) الانتظار قبل الجولة التالية
                 time.sleep(self.fetch_interval)
+
             except Exception as e:
-                logger.error(f"Error in service loop: {str(e)}")
+                logger.error(f"Error in service loop: {e}", exc_info=True)
                 time.sleep(60)
+
 
 if __name__ == "__main__":
     service = NewsService()
