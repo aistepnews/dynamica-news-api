@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from news_fetcher_service import get_news  # تأكد من أن هذه الدالة موجودة في news_fetcher_service
-from narrative_generator import generate_narrative  # تأكد من أن هذه الدالة موجودة في narrative_generator
+from news_fetcher_service import get_news  # تأكد من أن هذه الدالة موجودة
+from narrative_generator import generate_narrative  # تأكد من أن هذه الدالة موجودة
 
 app = FastAPI()
 
