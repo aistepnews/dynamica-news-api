@@ -30,8 +30,11 @@ async def get_news_list(limit: int = 10, processed: bool = False):
 
 @app.get("/narrative/{news_id}")
 async def get_narrative(news_id: int):
-    # ننادي OpenAI لتوليد الرواية
-    text = generate_narrative(news_id)
-    if not text:
-        raise HTTPException(status_code=404, detail="Narrative not found.")
-    return {"narrative": text}
+    # أولًا نحصل على الخبر من قاعدة البيانات
+    all_news = news_fetcher.get_news(limit=1000)  # نجلب كل الأخبار
+    item = next((n for n in all_news if n["id"] == news_id), None)
+    if not item:
+        raise HTTPException(status_code=404, detail="خبر غير موجود.")
+    # نبني النص ونمرره لدالة التحليل
+    analysis = generate_narrative(item["title"], item["content"])
+    return {"narrative": analysis}
