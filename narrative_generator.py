@@ -1,38 +1,28 @@
 # src/narrative_generator.py
 
-import os
-import requests
+from transformers import pipeline
+from functools import lru_cache
 
-HF_TOKEN = os.environ["HUGGINGFACE_API_TOKEN"]
+# نحمل الموديل مرّة وحدة عند بدء التشغيل
+@lru_cache(maxsize=1)
+def get_summarizer():
+    # يمكنك اختيار موديل أخف لو تحب: "sshleifer/distilbart-cnn-12-6"
+    return pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
 
-# نموذج مجاني مدعوم للـInference
-HF_MODEL = "sshleifer/distilbart-cnn-12-6"
-API_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
-
-HEADERS = {
-    "Authorization": f"Bearer {HF_TOKEN}",
-    "Accept": "application/json"
-}
-
-def generate_narrative(title: str, content: str) -> str:
+def generate_narrative(news_id: int, title: str, content: str) -> str:
     prompt = (
         f"عنوان الخبر: {title}\n\n"
         f"المحتوى:\n{content}\n\n"
-        f"اكتب تحليلًا معمقًا احترافيًا لهذا الخبر."
+        "اكتب تحليلًا معمقًا احترافيًا لهذا الخبر:"
     )
-    payload = {
-        "inputs": prompt,
-        "parameters": {
-            "max_length": 512,
-            "temperature": 0.7
-        }
-    }
-
-    resp = requests.post(API_URL, headers=HEADERS, json=payload, timeout=30)
-    resp.raise_for_status()
-    data = resp.json()
-    if isinstance(data, list) and data and "summary_text" in data[0]:
-        return data[0]["summary_text"].strip()
-    if isinstance(data, dict) and "error" in data:
-        raise ValueError(f"HuggingFace error: {data['error']}")
-    raise ValueError("Unexpected response format from HF API")
+    summarizer = get_summarizer()
+    # يقلّل الحجم لو المحتوى طويل جداً
+    text_to_send = prompt if len(prompt) < 1000 else prompt[:1000] + " …"
+    result = summarizer(
+        text_to_send,
+        max_length=300,
+        min_length=100,
+        do_sample=False
+    )
+    # pipeline بترجع list[{"summary_text": "..."}]
+    return result[0]["summary_text"].strip()
