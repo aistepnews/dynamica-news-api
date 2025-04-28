@@ -29,13 +29,13 @@ async def get_news_list(limit: int = 10, processed: bool = False):
 
 @app.get("/narrative/{news_id}")
 async def get_narrative(news_id: int):
-    # جلب كل الأخبار ثم البحث عن الخبر المطلوب
-    all_news = news_fetcher.get_news(limit=1000)
-    item = next((n for n in all_news if n["id"] == news_id), None)
-    if not item:
-        raise HTTPException(status_code=404, detail="خبر غير موجود.")
-    # توليد الرواية بناءً على العنوان والمحتوى
-    narrative = generate_narrative(item["title"], item["content"])
-    if not narrative:
-        raise HTTPException(status_code=404, detail="Narrative not found.")
-    return {"narrative": narrative}
++    # جيب أولاً عنوان ومحتوى الخبر من قاعدة البيانات
++    item = news_fetcher.get_news(limit=1, offset=0, processed=None)
++    item = next((n for n in item if n["id"] == news_id), None)
++    if not item:
++        raise HTTPException(status_code=404, detail="خبر غير موجود.")
++    # مّرر الـtitle والـcontent
++    text = generate_narrative(news_id, item["title"], item["content"])
+     if not text:
+         raise HTTPException(status_code=404, detail="Narrative not found.")
+     return {"narrative": text}
