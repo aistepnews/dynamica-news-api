@@ -10,13 +10,14 @@ from datetime import datetime
 import os
 
 class NewsAutoFetcher:
-    def __init__(self, db_path="news_cache.db"):
-        self.db_path = db_path
-        self.sources = {
-            "step_agency": {
-                "name": "وكالة ستيب الإخبارية",
-                "url": "https://stepagency-sy.net/",
-                "active": True
++    def __init__(self, db_path="news_cache.db"):
++        self.db_path = db_path
++        # الآن نستخدم RSS Feed مباشرةً
++        self.sources = {
++            "step_agency": {
++                "name": "وكالة ستيب الإخبارية",
++                "url": "https://stepagency-sy.net/feed/",  # رابط الـ RSS
++                "active": True
             }
         }
         self._init_db()
