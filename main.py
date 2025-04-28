@@ -30,12 +30,20 @@ async def get_news_list(limit: int = 10, processed: bool = False):
 
 @app.get("/narrative/{news_id}")
 async def get_narrative(news_id: int):
-    # أولًا نجلب بيانات الخبر من قاعدة البيانات
-    news_items = news_fetcher.get_news(limit=1000)
-    item = next((n for n in news_items if n["id"] == news_id), None)
+    # **1**– نجلب آخر الأخبار (يملأ القاعدة إذا كانت فارغة)
+    news_fetcher.fetch_news()
+
+    # **2**– نقرأ كل الأخبار الموجودة
+    all_news = news_fetcher.get_news(limit=1000, processed=None)
+
+    # **3**– نبحث الخبر بالـID
+    item = next((n for n in all_news if n["id"] == news_id), None)
     if not item:
         raise HTTPException(status_code=404, detail="خبر غير موجود.")
-    # ثانيًا نبني التحليل باستخدام العنوان والمحتوى
+
+    # **4**– نبني الـprompt من العنوان والمحتوى
+    from narrative_generator import generate_narrative
     analysis = generate_narrative(item["title"], item["content"])
+
     return {"narrative": analysis}
 
