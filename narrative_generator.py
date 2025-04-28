@@ -1,6 +1,7 @@
 import os
-os.environ.pop("HTTP_PROXY", None)
-os.environ.pop("HTTPS_PROXY", None)
+# ↙️ نلغي أي قيمة بروكسي لو موجودة:
+os.environ["HTTP_PROXY"] = ""
+os.environ["HTTPS_PROXY"] = ""
 
 from dotenv import load_dotenv
 import openai
@@ -15,7 +16,6 @@ def generate_narrative(title: str, content: str) -> str:
         f"المحتوى:\n{content}\n\n"
         f"الرجاء كتابة تحليل مفصل."
     )
-    # نستخدم الواجهة الجديدة للمكملات
     response = openai.completions.create(
         model="text-davinci-003",
         prompt=prompt,
