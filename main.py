@@ -1,4 +1,3 @@
-# main.py
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from news_fetcher import NewsAutoFetcher
@@ -22,6 +21,7 @@ async def root():
 
 @app.get("/news")
 async def get_news_list(limit: int = 10, processed: bool = False):
+    # نجمع الأخبار (من RSS) ثم نرجّع أول X عناصر
     news_fetcher.fetch_news()
     data = news_fetcher.get_news(limit=limit, processed=processed)
     if not isinstance(data, list):
@@ -30,6 +30,7 @@ async def get_news_list(limit: int = 10, processed: bool = False):
 
 @app.get("/narrative/{news_id}")
 async def get_narrative(news_id: int):
+    # ننادي OpenAI لتوليد الرواية
     text = generate_narrative(news_id)
     if not text:
         raise HTTPException(status_code=404, detail="Narrative not found.")
