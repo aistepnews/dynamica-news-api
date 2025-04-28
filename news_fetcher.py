@@ -21,6 +21,7 @@ class NewsAutoFetcher:
     def _init_db(self):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
+
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS news (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,6 +36,7 @@ class NewsAutoFetcher:
                 processed BOOLEAN DEFAULT 0
             )
         ''')
+
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS sources (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -43,14 +45,17 @@ class NewsAutoFetcher:
                 active BOOLEAN DEFAULT 1
             )
         ''')
-        # نضيف المصدر الافتراضي لو مش موجود
+
+        # نمسح كل المدخلات القديمة في جدول المصادر
+        cursor.execute("DELETE FROM sources")
+
+        # نعيد إدخال المصدر الوحيد برابط الـRSS الجديد
         for src in self.sources.values():
-            cursor.execute("SELECT id FROM sources WHERE url = ?", (src["url"],))
-            if not cursor.fetchone():
-                cursor.execute(
-                    "INSERT INTO sources (name, url, active) VALUES (?, ?, ?)",
-                    (src["name"], src["url"], src["active"])
-                )
+            cursor.execute(
+                "INSERT INTO sources (name, url, active) VALUES (?, ?, ?)",
+                (src["name"], src["url"], src["active"])
+            )
+
         conn.commit()
         conn.close()
 
