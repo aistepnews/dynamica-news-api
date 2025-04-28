@@ -158,3 +158,28 @@ class NewsAutoFetcher:
         conn.commit()
         conn.close()
         return {"success": True, "message": "تم تحديث حالة الخبر بنجاح"}
+
+    def get_news_by_id(self, news_id: int):
+        """إرجاع خبر واحد حسب الـ id أو None إذا لم يوجد."""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, title, content, image_url, source, source_url, published_date, created_at, processed
+            FROM news WHERE id = ?
+        """, (news_id,))
+        row = cursor.fetchone()
+        conn.close()
+        if not row:
+            return None
+        return {
+            "id": row[0],
+            "title": row[1],
+            "content": row[2],
+            "image_url": row[3],
+            "source": row[4],
+            "source_url": row[5],
+            "published_date": row[6],
+            "created_at": row[7],
+            "processed": bool(row[8])
+        }
+
