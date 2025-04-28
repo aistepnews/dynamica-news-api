@@ -1,36 +1,43 @@
-# narrative_generator.py
+# src/narrative_generator.py
+
 import os
 import requests
-from dotenv import load_dotenv
 
-load_dotenv()
+# اقرأ التوكن من متغيّر البيئة HUGGINGFACE_API_TOKEN
+HF_TOKEN = os.environ["HUGGINGFACE_API_TOKEN"]
 
-HF_TOKEN = os.getenv("HUGGINGFACE_API_TOKEN")
-# اختر نموذجًا يناسبك؛ هنا gpt2-medium كمثال
-HF_API_URL = "https://api-inference.huggingface.co/models/gpt2-medium"
+# استدعاء نموذج مناسب (مثال: facebook/bart-large-cnn للتحليل/التلخيص العميق)
+HF_MODEL = "facebook/bart-large-cnn"
+API_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
 
-def generate_narrative(news_id, title, content):
+HEADERS = {
+    "Authorization": f"Bearer {HF_TOKEN}",
+    "Accept": "application/json"
+}
+
+def generate_narrative(title: str, content: str) -> str:
+    """
+    يُرسل العنوان والمحتوى إلى نموذج HF للحصول على تحليل معمق.
+    """
     prompt = (
-        f"Deep analysis of the following news article:\n"
-        f"Title: {title}\n\n"
-        f"Content:\n{content}\n\n"
-        f"Please provide a thoughtful, in-depth analysis."
+        f"العنوان: {title}\n\n"
+        f"المحتوى:\n{content}\n\n"
+        f"قدّم تحليلًا معمقًا احترافيًا لهذا الخبر."
     )
-    headers = {
-        "Authorization": f"Bearer {HF_TOKEN}",
-        "Content-Type": "application/json"
-    }
     payload = {
         "inputs": prompt,
         "parameters": {
-            "max_new_tokens": 200,    # قلّل إن أردت
-            "temperature": 0.7
+            "max_length": 512,
+            "temperature": 0.7,
+            "return_full_text": False
         }
     }
-    response = requests.post(HF_API_URL, headers=headers, json=payload, timeout=30)
-    response.raise_for_status()
-    data = response.json()
-    # النتيجة غالبًا قائمة من نتائج التوليد
-    generated = data[0].get("generated_text", "")
-    # البادئة الحالية تحتوي على prompt + التوليد؛ نوّقع فيها:
-    return generated[len(prompt):].strip()
+
+    resp = requests.post(API_URL, headers=HEADERS, json=payload, timeout=30)
+    resp.raise_for_status()
+    data = resp.json()
+    # HF غالبًا يرجّع قائمة من المخرجات
+    if isinstance(data, list) and len(data) and "generated_text" in data[0]:
+        return data[0]["generated_text"].strip()
+    # في حال تنسيق مختلف:
+    raise ValueError("Unexpected response from HuggingFace API")
