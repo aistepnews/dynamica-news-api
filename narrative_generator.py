@@ -1,3 +1,4 @@
+# narrative_generator.py
 import os
 from dotenv import load_dotenv
 import openai
@@ -12,9 +13,13 @@ def generate_narrative(title: str, content: str) -> str:
         f"المحتوى:\n{content}\n\n"
         f"الرجاء كتابة تحليل مفصل."
     )
-    response = openai.Completion.create(
-        engine="text-davinci-003",
+
+    # واجهة V1 الجديدة للمكملات
+    response = openai.completions.create(
+        model="text-davinci-003",
         prompt=prompt,
         max_tokens=1000
     )
+
+    # نصّ النتيجة موجود في choices[0].text
     return response.choices[0].text.strip()
