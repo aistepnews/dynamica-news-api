@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import openai
 
 load_dotenv()
-openai.api_key = os.getenv("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")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_narrative(title: str, content: str) -> str:
     prompt = (
