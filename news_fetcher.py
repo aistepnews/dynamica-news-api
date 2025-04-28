@@ -8,7 +8,7 @@ from datetime import datetime
 class NewsAutoFetcher:
     def __init__(self, db_path="news_cache.db"):
         self.db_path = db_path
-        # نستخدم هنا رابط الـ RSS مباشرة
+        # الآن نستخدم RSS Feed مباشرةً
         self.sources = {
             "step_agency": {
                 "name": "وكالة ستيب الإخبارية",
