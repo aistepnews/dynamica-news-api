@@ -1,6 +1,4 @@
 import os
-
-# ↙️ نشيل متغيرات البروكسي حتى لا تُمرّر للمكتبة:
 os.environ.pop("HTTP_PROXY", None)
 os.environ.pop("HTTPS_PROXY", None)
 
