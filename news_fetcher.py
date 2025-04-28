@@ -14,7 +14,7 @@ class NewsAutoFetcher:
         self.sources = {
             "step_agency": {
                 "name": "وكالة ستيب الإخبارية",
-                "url": "https://stepagency-sy.net/",
+                "url": "url": "https://stepagency-sy.net/feed",
                 "active": True
             }
         }
