@@ -1,3 +1,4 @@
+
 import requests
 from bs4 import BeautifulSoup
 import hashlib
@@ -14,7 +15,7 @@ class NewsAutoFetcher:
         self.sources = {
             "step_agency": {
                 "name": "وكالة ستيب الإخبارية",
-                "url": "url": "https://stepagency-sy.net/feed",
+                "url": "https://stepagency-sy.net/",
                 "active": True
             }
         }
