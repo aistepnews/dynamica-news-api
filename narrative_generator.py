@@ -1,24 +1,23 @@
-import os
-# نلغي أي بروكسيات
-os.environ.pop("HTTP_PROXY", None)
-os.environ.pop("HTTPS_PROXY", None)
+# narrative_generator.py
 
+import os
 import openai
 
-# افتح المفتاح مباشرة
-openai.api_key = "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"
+# يقرأ المفتاح من متغيّر البيئة OPENAI_API_KEY
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-def generate_narrative(title: str, content: str) -> str:
+def generate_narrative(title, content):
     prompt = (
-        f"Write a deep analysis for the following news article:\n\n"
-        f"Title: {title}\n\n"
-        f"Content:\n{content}\n\n"
-        f"Please provide a detailed analytical narrative."
+        f"اكتب تحليلًا معمقًا لهذا الخبر:\n\n"
+        f"العنوان: {title}\n\n"
+        f"النص: {content}"
     )
 
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
+    # استخدم ChatCompletion لو كانت مكتبتك >=1.0.0
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt}],
         max_tokens=1000
     )
-    return response.choices[0].text.strip()
+
+    return response.choices[0].message.content.strip()
